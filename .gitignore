@@ -1,0 +1,16 @@
+# Ignore document files
+测试文档.docx
+test_output.docx
+test.md
+
+# Ignore build output
+doc-converter-mcp/build/
+doc-converter-mcp/node_modules/
+
+# Ignore markdown guides
+API_USAGE_GUIDE.md
+how_to_bulid_mcp_server.md
+
+# Ignore test runner files
+doc-converter-mcp/test_docx_to_md.mjs
+doc-converter-mcp/test_runner.mjs
