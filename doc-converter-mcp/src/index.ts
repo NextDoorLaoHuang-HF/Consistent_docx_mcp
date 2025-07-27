@@ -1,9 +1,15 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import fs from "fs/promises";
 import mammoth from "mammoth";
 import axios from "axios";
+import minimist from "minimist";
+
+// --- Argument Parsing ---
+const args = minimist(process.argv.slice(2));
+const apiKeyFromArgs = args['api-key'] || args['apiKey'];
 
 // Create server instance
 const server = new McpServer({
@@ -51,7 +57,7 @@ server.tool(
 
 server.tool(
   "markdown_to_docx",
-  "Generates a new .docx file from a Markdown string, applying styles from a reference .docx document. This tool calls a secure external API to perform the conversion. It requires the `DOC_CONVERTER_API_KEY` environment variable to be set for authentication. The user must provide the Markdown content, an absolute path to a reference .docx file for styling, and an absolute path where the generated file will be saved. It returns a confirmation message with the output file path upon success.",
+  "Generates a new .docx file from a Markdown string, applying styles from a reference .docx document. This tool calls a secure external API to perform the conversion. It requires an API key for authentication, provided via command-line argument when starting the server.",
   {
     markdown: z.string().describe("The Markdown content that will be placed in the new document."),
     referencePath: z.string().describe("The absolute path to a .docx file whose styles will be used as a template."),
@@ -59,10 +65,10 @@ server.tool(
   },
   async ({ markdown, referencePath, outputPath }) => {
     try {
-      // 1. Get API Key from environment variables
-      const apiKey = process.env.DOC_CONVERTER_API_KEY;
+      // 1. Get API Key from environment or command-line arguments
+      const apiKey = apiKeyFromArgs || process.env.DOC_CONVERTER_API_KEY;
       if (!apiKey) {
-        throw new Error("API key is not set. Please set the DOC_CONVERTER_API_KEY environment variable.");
+        throw new Error("API key is not set. Please provide it via the --api-key command-line argument or set the DOC_CONVERTER_API_KEY environment variable.");
       }
 
       // 2. Read the reference file and encode it in Base64
@@ -80,7 +86,7 @@ server.tool(
             "Content-Type": "application/json",
             "Authorization": `Bearer ${apiKey}`,
           },
-          responseType: 'arraybuffer', // Important for receiving binary file data
+          responseType: 'arraybuffer',
         }
       );
 
@@ -99,15 +105,11 @@ server.tool(
       let errorMessage = "An unknown error occurred.";
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           const errorData = JSON.parse(Buffer.from(error.response.data).toString('utf8'));
           errorMessage = `API Error (${error.response.status}): ${errorData.error || 'Failed to generate DOCX.'}`;
         } else if (error.request) {
-          // The request was made but no response was received
           errorMessage = "API Error: No response received from the server.";
         } else {
-          // Something happened in setting up the request that triggered an Error
           errorMessage = `API Error: ${error.message}`;
         }
       } else if (error instanceof Error) {
@@ -126,11 +128,12 @@ server.tool(
   }
 );
 
+
 // Main function to run the server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Doc Converter MCP Server running on stdio");
+  console.error("Doc Converter MCP Server running on stdio. Ready to receive commands.");
 }
 
 main().catch((error) => {
