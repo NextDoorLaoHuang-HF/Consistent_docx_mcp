@@ -13,7 +13,7 @@
 
 2.  **`markdown_to_docx`**
     -   **功能**: 根据 Markdown 内容和参考样式，生成一个新的 `.docx` 文件。
-    -   **描述**: 将您的 Markdown 文本，按照一个参考 `.docx` 文件的样式，生成一个格式精美的新文档。
+    -   **描述**: 将您的 Markdown 文本，按照一个参考 `.docx` 文件的样式，生成一个格式一致的新文档。
     -   **参数**:
         -   `markdown` (字符串) - 要转换的 Markdown 内容。
         -   `referencePath` (字符串) - 作为样式模板的 `.docx` 文件的绝对路径。
