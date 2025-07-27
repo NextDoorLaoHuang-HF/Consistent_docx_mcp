@@ -51,17 +51,6 @@
 
 现在，客户端将自动通过 `npx` 下载并运行此工具，您可以在客户端中直接调用 `docx_to_markdown` 和 `markdown_to_docx`。
 
-## 发布到 NPM (可选)
-
-为了让 `npx` 命令正常工作，您需要将此项目发布到 npm：
-
-1.  确保您已安装 Node.js 和 npm，并拥有一个 npm 账户。
-2.  在 `doc-converter-mcp` 目录下登录您的 npm 账户：`npm login`。
-3.  **重要**: 修改 `package.json` 中的 `name` 字段，确保它在 npm 上是唯一的。
-4.  运行发布命令：`npm publish`。
-
-发布成功后，任何人都可以通过 `npx consistent-docx-mcp --api-key ...` 来使用您的 MCP 服务器。
-
 ## 相关文档
 
 -   [**需求文档 (`REQUIREMENTS.md`)**](./REQUIREMENTS.md)
